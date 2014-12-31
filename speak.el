@@ -38,7 +38,10 @@ If function, call as a function.")
 (defun speak (sentence)
   "Speak SENTENCE."
   (interactive "sSentence: ")
-  (speak--internal sentence))
+  (when sentence
+    (setq sentence (replace-regexp-in-string "\r?\n" " " sentence))
+    (when (string-match-p "[^ ]" sentence)
+      (speak--internal sentence))))
 
 ;;;###autoload
 (defun speak-region (start end)
@@ -53,8 +56,13 @@ If function, call as a function.")
   (let ((word (if (region-active-p)
 		  (buffer-substring (region-beginning) (region-end))
 		(thing-at-point 'word))))
-    (when word
-      (speak word))))
+    (speak word)))
+
+;;;###autoload
+(defun speak-line ()
+  "Speak sentence on current line."
+  (interactive)
+  (speak (thing-at-point 'line)))
 
 (defvar speak--proc nil)
 
